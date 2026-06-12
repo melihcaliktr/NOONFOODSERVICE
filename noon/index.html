@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOON FOOD SERVICE — Profesyonel Gıda Tedariği</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root {
+    --white: #ffffff;
+    --bg: #ffffff;
+    --bg-soft: #f7fbff;
+    --ink: #0f0f18;
+    --ink-mid: #44445a;
+    --ink-light: #8b8ba0;
+    --blue: #38b6ff;
+    --blue-dark: #18a3ef;
+    --blue-soft: #e5f5ff;
+    --blue-softer: #f0faff;
+    --border: #e2eaf2;
+    --border-light: #f0f4f9;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.05), 0 2px 12px rgba(56,182,255,0.06);
+    --shadow-md: 0 4px 24px rgba(0,0,0,0.07), 0 2px 8px rgba(56,182,255,0.08);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.09), 0 4px 20px rgba(56,182,255,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 2px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5vw;
+    height: 70px;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-light);
+    transition: box-shadow 0.3s;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 12px;
+  }
+  .nav-logo img { height: 42px; width: auto; display: block; }
+  .nav-logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .nav-logo-brand {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .nav-logo-company {
+    font-size: 9.5px;
+    font-weight: 500;
+    color: var(--ink-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .nav-links-center {
+    display: flex; align-items: center; gap: 2px; list-style: none;
+  }
+  .nav-links-center a {
+    font-size: 13.5px; font-weight: 500; color: var(--ink-mid);
+    text-decoration: none; padding: 7px 15px; border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .nav-links-center a:hover, .nav-links-center a.active {
+    background: var(--blue-softer); color: var(--blue);
+  }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-cta {
+    background: var(--blue); color: white;
+    padding: 9px 22px; border-radius: 8px;
+    font-size: 13.5px; font-weight: 600; text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-cta:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    cursor: pointer; padding: 6px; background: none; border: none;
+  }
+  .hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: var(--ink); border-radius: 2px; transition: 0.3s;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 120px 5vw 90px;
+    position: relative; overflow: hidden; text-align: center;
+  }
+  .hero-blob-1 {
+    position: absolute; top: -80px; right: -100px;
+    width: 520px; height: 520px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,182,255,0.18) 0%, rgba(56,182,255,0.06) 50%, transparent 72%);
+    pointer-events: none; filter: blur(50px);
+  }
+  .hero-blob-2 {
+    position: absolute; top: 60px; left: -120px;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(160,220,255,0.15) 0%, rgba(190,235,255,0.05) 55%, transparent 75%);
+    pointer-events: none; filter: blur(55px);
+  }
+  .hero-blob-3 {
+    position: absolute; bottom: 80px; right: 22%;
+    width: 280px; height: 280px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,182,255,0.08) 0%, transparent 70%);
+    pointer-events: none; filter: blur(40px);
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 760px; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--blue-soft); border: 1px solid rgba(56,182,255,0.28);
+    border-radius: 100px; padding: 6px 18px;
+    font-size: 11.5px; font-weight: 600; color: var(--blue);
+    letter-spacing: 0.04em; margin-bottom: 32px;
+  }
+  .hero-badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--blue); animation: blink 2s ease infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero-h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(48px, 6.5vw, 90px);
+    font-weight: 400; line-height: 1.07;
+    letter-spacing: -0.02em; color: var(--ink); margin-bottom: 24px;
+  }
+  .hero-h1 em { font-style: italic; color: var(--blue); }
+
+  .hero-sub {
+    font-size: 17px; font-weight: 400; color: var(--ink-light);
+    line-height: 1.78; max-width: 520px; margin: 0 auto 44px;
+  }
+  .hero-actions {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    align-items: center; justify-content: center; margin-bottom: 60px;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--blue); color: white;
+    padding: 14px 32px; border-radius: 10px;
+    font-size: 14.5px; font-weight: 600; text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    box-shadow: 0 4px 20px rgba(56,182,255,0.42);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(56,182,255,0.52); background: var(--blue-dark); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--ink-mid); font-size: 14.5px; font-weight: 500;
+    text-decoration: none; padding: 14px 24px;
+    border: 1.5px solid var(--border); border-radius: 10px; background: white;
+    transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-2px); }
+  .btn-ghost svg, .btn-primary svg { transition: transform 0.2s; }
+  .btn-ghost:hover svg, .btn-primary:hover svg { transform: translateX(3px); }
+
+  /* Hero mock card */
+  .hero-visual-card {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 460px; margin: 0 auto;
+  }
+  .mock-card {
+    background: white; border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px;
+    box-shadow: var(--shadow-lg); text-align: left; position: relative;
+  }
+  .mock-card-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+  }
+  .mock-card-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .mock-card-date { font-size: 12px; color: var(--ink-light); }
+  .mock-order-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 13px;
+  }
+  .mock-order-item:last-of-type { border-bottom: none; }
+  .mock-item-name { color: var(--ink-mid); font-weight: 500; margin-bottom: 3px; }
+  .mock-item-cat {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    background: var(--blue-soft); color: var(--blue); padding: 2px 8px; border-radius: 4px;
+  }
+  .mock-item-status {
+    font-size: 11px; font-weight: 600; color: #22c55e;
+    display: flex; align-items: center; gap: 5px; white-space: nowrap;
+  }
+  .mock-item-status .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0;
+  }
+  .mock-item-status.blue { color: var(--blue); }
+  .mock-badge-group { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .mock-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--blue-softer); border: 1px solid rgba(56,182,255,0.15);
+    border-radius: 8px; padding: 7px 13px; font-size: 12px; font-weight: 600; color: var(--ink);
+  }
+  .float-pill {
+    position: absolute; background: white;
+    border: 1px solid var(--border); border-radius: 100px;
+    padding: 8px 16px; font-size: 12px; font-weight: 600; color: var(--ink);
+    box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 6px;
+    white-space: nowrap; z-index: 2;
+  }
+  .fp-1 { top: -18px; right: -55px; animation: fp1 6s ease-in-out infinite; }
+  .fp-2 { bottom: 50px; left: -65px; animation: fp2 7.5s ease-in-out infinite; }
+  @keyframes fp1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+  @keyframes fp2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-11px)} }
+
+  /* ── BRAND TICKER ── */
+  .brand-ticker {
+    overflow: hidden; white-space: nowrap;
+    padding: 13px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: white;
+  }
+  .brand-ticker-track {
+    display: inline-flex; align-items: center; gap: 0;
+    animation: ticker 22s linear infinite;
+  }
+  .brand-ticker-track span {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-light); padding: 0 28px;
+  }
+  .brand-ticker-track .brand-name {
+    color: var(--ink); font-weight: 800; letter-spacing: 0.18em;
+  }
+  .brand-ticker-track .brand-sep {
+    color: var(--blue); font-size: 14px; padding: 0 6px; letter-spacing: 0;
+  }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 0 5vw; background: var(--bg-soft);
+  }
+  .stats-inner {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    max-width: 720px; margin: 0 auto;
+  }
+  .stat-item {
+    padding: 34px 16px; text-align: center; border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(28px, 3.5vw, 46px); font-weight: 400;
+    color: var(--ink); line-height: 1; margin-bottom: 6px;
+  }
+  .stat-num .accent { color: var(--blue); }
+  .stat-label {
+    font-size: 11px; font-weight: 600; color: var(--ink-light);
+    letter-spacing: 0.07em; text-transform: uppercase;
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 100px 5vw; }
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--blue); margin-bottom: 16px;
+  }
+  .section-label::before {
+    content: ''; display: block; width: 18px; height: 1.5px;
+    background: var(--blue); border-radius: 2px;
+  }
+  .section-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(30px, 4vw, 54px); font-weight: 400;
+    line-height: 1.12; letter-spacing: -0.01em; margin-bottom: 14px; color: var(--ink);
+  }
+  .section-title em { font-style: italic; color: var(--blue); }
+  .section-sub {
+    font-size: 16px; font-weight: 400; color: var(--ink-light);
+    line-height: 1.75; max-width: 480px; margin-bottom: 48px;
+  }
+
+  /* ── ABOUT ── */
+  #hakkimizda { background: var(--bg-soft); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .about-quote {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(16px, 1.8vw, 20px); font-weight: 400; font-style: italic;
+    line-height: 1.6; color: var(--ink-mid);
+    border-left: 2px solid var(--blue); padding-left: 20px; margin: 32px 0;
+  }
+  .about-body { font-size: 15.5px; color: var(--ink-mid); line-height: 1.87; }
+  .about-body strong { color: var(--ink); font-weight: 600; }
+  .about-pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+  .pillar-card {
+    background: white; border: 1px solid var(--border); border-radius: 14px; padding: 22px;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  }
+  .pillar-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(56,182,255,0.35); }
+  .pillar-icon { font-size: 26px; margin-bottom: 10px; display: block; }
+  .pillar-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+  .pillar-text { font-size: 12px; color: var(--ink-light); line-height: 1.6; }
+  .about-big-heading {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(34px, 4.5vw, 58px); font-weight: 400;
+    line-height: 1.1; color: var(--ink); margin-bottom: 24px; letter-spacing: -0.01em;
+  }
+  .about-big-heading em { font-style: italic; color: var(--blue); }
+  .about-stats-row {
+    display: flex; gap: 32px; margin-top: 36px; padding-top: 32px; border-top: 1px solid var(--border);
+  }
+  .about-stat-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px; font-weight: 400; color: var(--blue); line-height: 1; margin-bottom: 4px;
+  }
+  .about-stat-label { font-size: 11px; font-weight: 600; color: var(--ink-light); text-transform: uppercase; letter-spacing: 0.07em; }
+
+  /* ── PRODUCTS ── */
+  #urunler { background: white; }
+  .products-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; margin-bottom: 44px; flex-wrap: wrap;
+  }
+  .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .product-card {
+    border-radius: 18px; padding: 28px 24px 24px; position: relative; overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s; cursor: default; border: 1px solid transparent;
+  }
+  .product-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+  .product-card:nth-child(1) { background: #edf7ff; border-color: #cde8ff; }
+  .product-card:nth-child(2) { background: #f0f9ff; border-color: #d0ecff; }
+  .product-card:nth-child(3) { background: #e8f5ff; border-color: #c8e8ff; }
+  .product-card:nth-child(4) { background: #f4fbff; border-color: #d4efff; }
+  .product-card:nth-child(5) { background: #ebf6ff; border-color: #c4e4ff; }
+  .product-card:nth-child(6) { background: #e0f3ff; border-color: #b8e0ff; }
+  .product-num { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: var(--blue); opacity: 0.6; text-transform: uppercase; margin-bottom: 16px; }
+  .product-icon { font-size: 38px; margin-bottom: 14px; display: block; transition: transform 0.3s; }
+  .product-card:hover .product-icon { transform: scale(1.1) rotate(-4deg); }
+  .product-title { font-family: 'Instrument Serif', serif; font-size: 21px; font-weight: 400; color: var(--ink); margin-bottom: 10px; line-height: 1.25; }
+  .product-desc { font-size: 13px; color: var(--ink-mid); line-height: 1.7; margin-bottom: 18px; }
+  .product-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+  .tag { font-size: 11px; font-weight: 500; padding: 4px 11px; background: rgba(255,255,255,0.75); border: 1px solid rgba(56,182,255,0.22); border-radius: 100px; color: var(--ink-mid); }
+  .product-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; transition: gap 0.2s; }
+  .product-link:hover { gap: 10px; }
+
+  /* ── SECTORS ── */
+  #sektorler { background: var(--bg-soft); }
+  .sectors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .sector-item {
+    background: white; border: 1px solid var(--border); border-radius: 18px; padding: 32px 24px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; cursor: default;
+  }
+  .sector-item:hover { transform: translateY(-4px); border-color: rgba(56,182,255,0.4); box-shadow: var(--shadow-md); }
+  .sector-emoji { font-size: 38px; }
+  .sector-name { font-family: 'Instrument Serif', serif; font-size: 21px; font-weight: 400; color: var(--ink); }
+  .sector-arrow {
+    width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    margin-top: auto; transition: background 0.2s, border-color 0.2s;
+  }
+  .sector-item:hover .sector-arrow { background: var(--blue); border-color: var(--blue); }
+  .sector-item:hover .sector-arrow path { stroke: white; }
+
+  /* ── HORECA ── */
+  #horeca { background: white; }
+  .horeca-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .horeca-visual {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 44px; position: relative; overflow: hidden;
+  }
+  .horeca-visual-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue); margin-bottom: 32px; }
+  .horeca-acronym { display: flex; flex-direction: column; margin-bottom: 32px; }
+  .acronym-row { display: flex; align-items: center; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+  .acronym-row:last-child { border-bottom: none; }
+  .acronym-letter { font-family: 'Instrument Serif', serif; font-size: 46px; font-weight: 400; color: var(--blue); width: 58px; flex-shrink: 0; line-height: 1; }
+  .acronym-word { font-family: 'Instrument Serif', serif; font-size: 19px; font-weight: 400; color: var(--ink); }
+  .acronym-desc { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
+  .horeca-caption { font-family: 'Instrument Serif', serif; font-size: 15px; font-style: italic; color: var(--ink-mid); line-height: 1.7; border-left: 2px solid var(--blue); padding-left: 16px; }
+  .horeca-caption strong { color: var(--blue); font-style: normal; }
+  .horeca-body { font-size: 15.5px; color: var(--ink-mid); line-height: 1.87; margin-bottom: 32px; }
+  .horeca-body strong { color: var(--ink); }
+  .horeca-checklist { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    opacity: 0; transform: translateX(14px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .check-item.visible { opacity: 1; transform: none; }
+  .check-icon {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--blue-soft); border: 1px solid rgba(56,182,255,0.3);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .check-text { font-size: 15px; color: var(--ink-mid); line-height: 1.5; }
+
+  /* ── QUOTE ── */
+  .quote-section {
+    background: var(--ink); padding: 96px 5vw;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .quote-section::before {
+    content: '"'; position: absolute; top: -60px; left: 4%;
+    font-family: 'Instrument Serif', serif; font-size: 360px; font-weight: 400;
+    color: rgba(56,182,255,0.07); line-height: 1; pointer-events: none;
+  }
+  .quote-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(20px, 3vw, 40px); font-weight: 400; font-style: italic;
+    color: white; max-width: 760px; margin: 0 auto 18px; line-height: 1.45; position: relative;
+  }
+  .quote-text em { color: var(--blue); font-style: normal; }
+  .quote-attr { font-size: 12px; color: rgba(255,255,255,0.3); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; position: relative; }
+
+  /* ── CONTACT ── */
+  #iletisim { background: var(--bg-soft); }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .contact-info-cards { display: flex; flex-direction: column; gap: 10px; margin-top: 36px; }
+  .contact-card {
+    background: white; border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px;
+    display: flex; align-items: flex-start; gap: 14px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .contact-card:hover { border-color: rgba(56,182,255,0.4); transform: translateX(4px); }
+  .contact-card-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+  .contact-card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; }
+  .contact-card-value { font-size: 14px; color: var(--ink); line-height: 1.6; }
+  .contact-form { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 44px; }
+  .contact-form h3 { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; margin-bottom: 28px; color: var(--ink); }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 8px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--bg-soft); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 12px 15px;
+    font-family: 'Inter', sans-serif; font-size: 14px; color: var(--ink);
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--blue); box-shadow: 0 0 0 3px rgba(56,182,255,0.12); background: white;
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: var(--ink-light); }
+  .form-group textarea { resize: vertical; min-height: 92px; }
+  .form-group select option { background: white; color: var(--ink); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btn-submit {
+    width: 100%; padding: 15px; background: var(--blue); color: white; border: none;
+    border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    margin-top: 8px; box-shadow: 0 4px 16px rgba(56,182,255,0.38);
+  }
+  .btn-submit:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(56,182,255,0.5); }
+
+  /* ── BRANDS ── */
+  .brands-section {
+    padding: 80px 0 72px;
+    background: white;
+    overflow: hidden;
+  }
+  .brands-header {
+    text-align: center;
+    padding: 0 5vw 48px;
+  }
+  .brands-header .section-label { justify-content: center; }
+  .brands-header .section-title { max-width: 480px; margin: 0 auto 14px; }
+  .brands-sub {
+    font-size: 15px; color: var(--ink-light); line-height: 1.75;
+    max-width: 420px; margin: 0 auto;
+  }
+  .brands-slider-wrap {
+    position: relative; overflow: hidden;
+    mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+  }
+  .brands-track {
+    display: flex; align-items: center; gap: 72px;
+    width: max-content; padding: 10px 0;
+    animation: brandsScroll 24s linear infinite;
+  }
+  .brands-track:hover { animation-play-state: paused; }
+  .brand-logo-item {
+    display: flex; align-items: center; justify-content: center;
+    height: 68px; flex-shrink: 0;
+  }
+  .brand-logo-item img {
+    height: 100%; width: auto; max-width: 150px; object-fit: contain;
+    filter: grayscale(1) opacity(0.5);
+    transition: filter 0.35s ease, transform 0.25s ease;
+  }
+  .brand-logo-item img:hover { filter: grayscale(0) opacity(0.9); transform: scale(1.06); }
+  @keyframes brandsScroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── MAP ── */
+  #address-map {
+    height: 220px; border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--border); margin-top: 16px;
+  }
+  .maplibregl-popup-content {
+    font-family: 'Inter', sans-serif; border-radius: 10px;
+    padding: 12px 14px; box-shadow: var(--shadow-md);
+  }
+  .maplibregl-ctrl-group { border: 1px solid var(--border) !important; border-radius: 8px !important; box-shadow: var(--shadow-sm) !important; }
+  .maplibregl-ctrl button { border-radius: 8px !important; }
+
+  /* ── FOOTER ── */
+  footer { background: var(--ink); padding: 0 5vw; }
+  .footer-brand-section {
+    padding: 60px 0 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .footer-brand-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 400;
+    color: white;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .footer-brand-name span { color: var(--blue); }
+  .footer-brand-company {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .footer-brand-tagline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: rgba(255,255,255,0.3);
+    max-width: 300px;
+    line-height: 1.6;
+    text-align: right;
+  }
+
+  .footer-inner { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 48px; padding: 40px 0 48px; }
+  .footer-logo { display: flex; align-items: center; text-decoration: none; margin-bottom: 14px; }
+  .footer-logo img { height: 36px; width: auto; filter: brightness(0) invert(1); }
+  .footer-desc { font-size: 13px; color: rgba(255,255,255,0.33); line-height: 1.75; max-width: 240px; }
+  .footer-col-title { font-size: 10.5px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.38); margin-bottom: 18px; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+  .footer-links a { font-size: 13.5px; color: rgba(255,255,255,0.43); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: white; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); padding: 24px 0; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+  .footer-copy { font-size: 11.5px; color: rgba(255,255,255,0.2); line-height: 1.6; }
+
+  /* ── ANIMATIONS ── */
+  .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .fade-up.visible { opacity: 1; transform: none; }
+
+  /* ── MOBILE NAV ── */
+  .mobile-nav {
+    display: none; position: fixed; inset: 0;
+    background: rgba(255,255,255,0.98); backdrop-filter: blur(20px);
+    z-index: 200; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
+  }
+  .mobile-nav.open { display: flex; }
+  .mobile-nav a { font-family: 'Instrument Serif', serif; font-size: 38px; font-weight: 400; color: var(--ink); text-decoration: none; transition: color 0.2s; }
+  .mobile-nav a:hover { color: var(--blue); }
+  .mobile-close { position: absolute; top: 20px; right: 22px; background: none; border: none; cursor: pointer; color: var(--ink); font-size: 24px; padding: 8px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .hero { min-height: auto; padding-top: 130px; }
+    .fp-1, .fp-2 { display: none; }
+  }
+  @media (max-width: 900px) {
+    .nav-links-center { display: none; }
+    .hamburger { display: flex; }
+    .about-grid, .horeca-grid, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    .products-grid { grid-template-columns: 1fr 1fr; }
+    .sectors-grid { grid-template-columns: 1fr 1fr; }
+    .stats-inner { grid-template-columns: repeat(3, 1fr); }
+    .about-pillars { grid-template-columns: 1fr 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; }
+    .footer-brand-section { flex-direction: column; align-items: flex-start; }
+    .footer-brand-tagline { text-align: left; }
+  }
+  @media (max-width: 600px) {
+    .products-grid, .sectors-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .contact-form { padding: 26px 20px; }
+    section { padding: 72px 5vw; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .about-pillars { grid-template-columns: 1fr; }
+    .horeca-visual { padding: 30px 24px; }
+    .hero-visual-card { display: none; }
+    .nav-logo-text { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SPIRAL CANVAS (fixed background) -->
+<canvas id="spiral-canvas" style="position:fixed;top:0;left:0;pointer-events:none;z-index:0;opacity:0.55;"></canvas>
+
+<!-- SITE CONTENT -->
+<div id="site-content" style="position:relative;z-index:1;">
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-close" onclick="closeMobileNav()">✕</button>
+  <a href="#hakkimizda" onclick="closeMobileNav()">Hakkımızda</a>
+  <a href="#urunler" onclick="closeMobileNav()">Ürünler</a>
+  <a href="#sektorler" onclick="closeMobileNav()">Sektörler</a>
+  <a href="#horeca" onclick="closeMobileNav()">HORECA</a>
+  <a href="#iletisim" onclick="closeMobileNav()">İletişim</a>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">
+    <img src="../noon_logo__2_-removebg-preview.png" alt="NOON Food Service">
+    <div class="nav-logo-text">
+      <span class="nav-logo-brand">Noon Food Service</span>
+      <span class="nav-logo-company">Global X Gıda Dağıtım</span>
+    </div>
+  </a>
+
+  <ul class="nav-links-center">
+    <li><a href="#hakkimizda">Hakkımızda</a></li>
+    <li><a href="#urunler">Ürünler</a></li>
+    <li><a href="#sektorler">Sektörler</a></li>
+    <li><a href="#horeca">HORECA</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="#iletisim" class="nav-cta">İletişim</a>
+    <button class="hamburger" onclick="openMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-blob-1"></div>
+  <div class="hero-blob-2"></div>
+  <div class="hero-blob-3"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      B2B &middot; HORECA &middot; Profesyonel Tedarik
+    </div>
+
+    <h1 class="hero-h1">
+      Profesyonel Mutfakların<br>
+      <em>Her An Yanında.</em>
+    </h1>
+
+    <p class="hero-sub">
+      Restoranlardan otellere, kafelerden endüstriyel mutfaklara kadar tüm profesyonel işletmelerin gıda tedarik ortağı. 7/24 erişilebilir, 24 saat teslimat.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#iletisim" class="btn-primary">
+        Teklif Alın
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2.5 7.5h10M7.5 2.5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#urunler" class="btn-ghost">
+        Ürünleri Keşfet
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2.5 7.5h10M7.5 2.5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <div class="hero-visual-card">
+      <div class="mock-card">
+        <div class="float-pill fp-1">🚚 24s teslimat hedefi</div>
+        <div class="float-pill fp-2">✓ 7/24 erişilebilir</div>
+        <div class="mock-card-header">
+          <div class="mock-card-title">Sipariş Durumu</div>
+          <div class="mock-card-date">Bugün · 09:30</div>
+        </div>
+        <div class="mock-order-item">
+          <div>
+            <div class="mock-item-name">Temel Gıda Paketi</div>
+            <span class="mock-item-cat">Un & Tahıl · Yağlar</span>
+          </div>
+          <div class="mock-item-status"><span class="dot"></span>Yolda</div>
+        </div>
+        <div class="mock-order-item">
+          <div>
+            <div class="mock-item-name">İtalyan Makarna Çeşitleri</div>
+            <span class="mock-item-cat">Dünya Mutfağı</span>
+          </div>
+          <div class="mock-item-status"><span class="dot"></span>Teslim</div>
+        </div>
+        <div class="mock-order-item">
+          <div>
+            <div class="mock-item-name">Espresso Harmanları</div>
+            <span class="mock-item-cat">İçecek & Bar</span>
+          </div>
+          <div class="mock-item-status blue"><span class="dot"></span>Hazırlanıyor</div>
+        </div>
+        <div class="mock-order-item">
+          <div>
+            <div class="mock-item-name">Pastacılık Kreması Set</div>
+            <span class="mock-item-cat">Pastacılık</span>
+          </div>
+          <div class="mock-item-status"><span class="dot"></span>Teslim</div>
+        </div>
+        <div class="mock-badge-group">
+          <div class="mock-badge">🥫 6 Kategori</div>
+          <div class="mock-badge">🕐 7/24</div>
+          <div class="mock-badge">🚀 24s Hedef</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND TICKER -->
+<div class="brand-ticker">
+  <div class="brand-ticker-track">
+    <span class="brand-name">NOON FOOD SERVICE</span>
+    <span class="brand-sep">·</span>
+    <span>GLOBAL X GIDA DAĞITIM</span>
+    <span class="brand-sep">·</span>
+    <span>PROFESYONEL TEDARIK</span>
+    <span class="brand-sep">·</span>
+    <span>B2B &amp; HORECA ÇÖZÜMLERİ</span>
+    <span class="brand-sep">·</span>
+    <span>BAŞAKŞEHİR / İSTANBUL</span>
+    <span class="brand-sep">·</span>
+    <span class="brand-name">NOON FOOD SERVICE</span>
+    <span class="brand-sep">·</span>
+    <span>GLOBAL X GIDA DAĞITIM</span>
+    <span class="brand-sep">·</span>
+    <span>PROFESYONEL TEDARIK</span>
+    <span class="brand-sep">·</span>
+    <span>B2B &amp; HORECA ÇÖZÜMLERİ</span>
+    <span class="brand-sep">·</span>
+    <span>BAŞAKŞEHİR / İSTANBUL</span>
+    <span class="brand-sep">·</span>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-num">7/24</div>
+      <div class="stat-label">Kesintisiz Destek</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">500+</div>
+      <div class="stat-label">Mutlu Müşteri</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1000+</div>
+      <div class="stat-label">Ürün Çeşidi</div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="hakkimizda">
+  <div class="about-grid">
+    <div>
+      <div class="section-label">Hakkımızda</div>
+      <p class="about-body">
+        Noon; işletmelerin mutfak operasyonlarını kesintisiz, verimli ve güvenilir şekilde sürdürebilmeleri için kurulmuş profesyonel gıda tedarik markasıdır. Yalnızca bir tedarikçi değil, <strong>operasyonel çözüm ortağınız.</strong>
+      </p>
+      <blockquote class="about-quote">
+        "Gıdanın yalnızca bir ürün değil; süreklilik, kalite ve güven anlamına geldiğine inanıyoruz."
+      </blockquote>
+      <div class="about-pillars">
+        <div class="pillar-card fade-up">
+          <span class="pillar-icon">🎯</span>
+          <div class="pillar-title">Vizyon</div>
+          <div class="pillar-text">Türkiye'nin ve bölgenin en güvenilir profesyonel gıda tedarik ağı olmak</div>
+        </div>
+        <div class="pillar-card fade-up" style="transition-delay:0.08s">
+          <span class="pillar-icon">🚀</span>
+          <div class="pillar-title">Misyon</div>
+          <div class="pillar-text">Her işletmenin ihtiyacını doğru zamanda, doğru kaliteyle ulaştırmak</div>
+        </div>
+        <div class="pillar-card fade-up" style="transition-delay:0.16s">
+          <span class="pillar-icon">⚡</span>
+          <div class="pillar-title">Hız</div>
+          <div class="pillar-text">24 saat içinde teslimat garantisi ile operasyonunuzu aksatmıyoruz</div>
+        </div>
+        <div class="pillar-card fade-up" style="transition-delay:0.24s">
+          <span class="pillar-icon">🌐</span>
+          <div class="pillar-title">Çeşitlilik</div>
+          <div class="pillar-text">Temel gıdadan dünya mutfağına geniş bir ürün portföyü</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fade-up">
+      <h2 class="about-big-heading">
+        Operasyonel Bir<br>
+        <em>Çözüm Ortağı</em>
+      </h2>
+      <p style="font-size:16px;color:var(--ink-mid);line-height:1.87;margin-bottom:20px;">
+        Tüm profesyonel mutfak kategorilerinde tek noktadan tedarik sağlayan, 7/24 erişilebilir sistemimizle operasyonunuzun hiç durmamasını garanti ediyoruz.
+      </p>
+      <p style="font-size:16px;color:var(--ink-mid);line-height:1.87;">
+        İstanbul Başakşehir'deki merkezimizden tüm Türkiye'ye, global kaynaklarımızla da dünyanın her yerine uzanan tedarik ağımızla yanınızdayız.
+      </p>
+      <div class="about-stats-row">
+        <div>
+          <div class="about-stat-num">6</div>
+          <div class="about-stat-label">Ana Kategori</div>
+        </div>
+        <div>
+          <div class="about-stat-num">7/24</div>
+          <div class="about-stat-label">Erişilebilirlik</div>
+        </div>
+        <div>
+          <div class="about-stat-num">24s</div>
+          <div class="about-stat-label">Teslimat</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="urunler">
+  <div class="products-header">
+    <div>
+      <div class="section-label">Ürün Portföyü</div>
+      <h2 class="section-title">6 Ana <em>Kategori</em></h2>
+    </div>
+    <p class="section-sub" style="margin-bottom:0;">Her mutfağın her ihtiyacı için geniş ürün yelpazesiyle yanınızdayız.</p>
+  </div>
+  <div class="products-grid">
+    <div class="product-card fade-up">
+      <div class="product-num">01</div>
+      <span class="product-icon">🥫</span>
+      <div class="product-title">Temel Gıda Ürünleri</div>
+      <div class="product-desc">Günlük operasyonların temelini oluşturan tüm ana gıda kategorilerinde geniş ürün çeşitliliği.</div>
+      <div class="product-tags">
+        <span class="tag">Un &amp; Tahıl</span><span class="tag">Pirinç &amp; Bakliyat</span>
+        <span class="tag">Yağlar</span><span class="tag">Baharat</span>
+        <span class="tag">Konserve</span><span class="tag">Donuk Ürün</span>
+      </div>
+      <a href="#iletisim" class="product-link">Detaylar <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="product-card fade-up" style="transition-delay:0.07s">
+      <div class="product-num">02</div>
+      <span class="product-icon">🌍</span>
+      <div class="product-title">Dünya Mutfağı Ürünleri</div>
+      <div class="product-desc">Asya'dan Akdeniz'e, Meksika'dan Orta Doğu'ya — menü çeşitliliğinizi destekliyoruz.</div>
+      <div class="product-tags">
+        <span class="tag">Asya Mutfağı</span><span class="tag">İtalyan</span>
+        <span class="tag">Meksika</span><span class="tag">Orta Doğu</span>
+      </div>
+      <a href="#iletisim" class="product-link">Detaylar <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="product-card fade-up" style="transition-delay:0.14s">
+      <div class="product-num">03</div>
+      <span class="product-icon">🎂</span>
+      <div class="product-title">Pastacılık &amp; Profesyonel Fırıncılık</div>
+      <div class="product-desc">Butik üreticilerden yüksek hacimli üretim süreçlerine uygun kapsamlı portföy.</div>
+      <div class="product-tags">
+        <span class="tag">Profesyonel Un</span><span class="tag">Kakao &amp; Çikolata</span>
+        <span class="tag">Kremalar</span><span class="tag">Glazür</span><span class="tag">Aromalar</span>
+      </div>
+      <a href="#iletisim" class="product-link">Detaylar <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="product-card fade-up" style="transition-delay:0.21s">
+      <div class="product-num">04</div>
+      <span class="product-icon">☕</span>
+      <div class="product-title">İçecek &amp; Profesyonel Bar</div>
+      <div class="product-desc">Sabah kahvesinden akşam servis operasyonuna — tüm içecek ihtiyaçlarınızda yanınızda.</div>
+      <div class="product-tags">
+        <span class="tag">Kahve</span><span class="tag">Çay</span>
+        <span class="tag">Soğuk İçecek</span><span class="tag">Mixoloji</span><span class="tag">Bar Şurubu</span>
+      </div>
+      <a href="#iletisim" class="product-link">Detaylar <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="product-card fade-up" style="transition-delay:0.28s">
+      <div class="product-num">05</div>
+      <span class="product-icon">✈️</span>
+      <div class="product-title">İthal &amp; Özel Ürün Tedariği</div>
+      <div class="product-desc">Global mutfak trendlerini takip ederek menünüzü çeşitlendirin, profesyonel standartlarınızı yükseltin.</div>
+      <div class="product-tags">
+        <span class="tag">Premium Soslar</span><span class="tag">Niş Ürünler</span>
+        <span class="tag">Global Trendler</span><span class="tag">İthal Hammadde</span>
+      </div>
+      <a href="#iletisim" class="product-link">Detaylar <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="product-card fade-up" style="transition-delay:0.35s">
+      <div class="product-num">06</div>
+      <span class="product-icon">🏨</span>
+      <div class="product-title">HORECA Çözümleri</div>
+      <div class="product-desc">Otel, restoran ve kafeler için operasyonel süreklilik odaklı tedarik yönetimi ve kurumsal ortaklık.</div>
+      <div class="product-tags">
+        <span class="tag">Düzenli Tedarik</span><span class="tag">Kurumsal Ortaklık</span><span class="tag">Özel Planlama</span>
+      </div>
+      <a href="#iletisim" class="product-link">Detaylar <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<!-- SECTORS -->
+<section id="sektorler">
+  <div class="section-label">Hizmet Sektörleri</div>
+  <h2 class="section-title">Kimlere Hizmet <em>Veriyoruz?</em></h2>
+  <p class="section-sub">Profesyonel mutfak operasyonu yürüten tüm işletme türlerine özel çözümler sunuyoruz.</p>
+  <div class="sectors-grid">
+    <div class="sector-item fade-up">
+      <div class="sector-emoji">🍽️</div>
+      <div class="sector-name">Restoranlar</div>
+      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="sector-item fade-up" style="transition-delay:0.07s">
+      <div class="sector-emoji">🏨</div>
+      <div class="sector-name">Oteller</div>
+      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="sector-item fade-up" style="transition-delay:0.14s">
+      <div class="sector-emoji">☕</div>
+      <div class="sector-name">Kafeler</div>
+      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="sector-item fade-up" style="transition-delay:0.21s">
+      <div class="sector-emoji">🎂</div>
+      <div class="sector-name">Pastaneler</div>
+      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="sector-item fade-up" style="transition-delay:0.28s">
+      <div class="sector-emoji">🍱</div>
+      <div class="sector-name">Catering Şirketleri</div>
+      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="sector-item fade-up" style="transition-delay:0.35s">
+      <div class="sector-emoji">🏭</div>
+      <div class="sector-name">Endüstriyel Mutfaklar</div>
+      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<!-- HORECA -->
+<section id="horeca">
+  <div class="horeca-grid">
+    <div>
+      <div class="section-label">HORECA Çözümleri</div>
+      <h2 class="section-title">Operasyonun<br>Devamlılığı <em>Bizim İşimiz</em></h2>
+      <p class="horeca-body">
+        HORECA sektöründe tedarik, yalnızca ürün temini değil; <strong>operasyonun devamlılığı</strong> anlamına gelir. Noon olarak bu sorumluluğun farkındayız.
+      </p>
+      <ul class="horeca-checklist">
+        <li class="check-item">
+          <div class="check-icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="#38b6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="check-text">Düzenli tedarik yönetimi</div>
+        </li>
+        <li class="check-item" style="transition-delay:0.08s">
+          <div class="check-icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="#38b6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="check-text">Yüksek ürün erişilebilirliği</div>
+        </li>
+        <li class="check-item" style="transition-delay:0.16s">
+          <div class="check-icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="#38b6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="check-text">Profesyonel sipariş süreçleri</div>
+        </li>
+        <li class="check-item" style="transition-delay:0.24s">
+          <div class="check-icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="#38b6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="check-text">Kurumsal çözüm ortaklığı</div>
+        </li>
+        <li class="check-item" style="transition-delay:0.32s">
+          <div class="check-icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="#38b6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="check-text">İşletmeye özel ürün planlaması</div>
+        </li>
+        <li class="check-item" style="transition-delay:0.40s">
+          <div class="check-icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5 4.5-4.5" stroke="#38b6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="check-text">Operasyonel destek ve danışmanlık</div>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="horeca-visual fade-up">
+        <div class="horeca-visual-title">HORECA Nedir?</div>
+        <div class="horeca-acronym">
+          <div class="acronym-row">
+            <div class="acronym-letter">HO</div>
+            <div>
+              <div class="acronym-word">Hotel</div>
+              <div class="acronym-desc">Otel &amp; Konaklama Tesisleri</div>
+            </div>
+          </div>
+          <div class="acronym-row">
+            <div class="acronym-letter">RE</div>
+            <div>
+              <div class="acronym-word">Restaurant</div>
+              <div class="acronym-desc">Restoran &amp; Yemek Hizmetleri</div>
+            </div>
+          </div>
+          <div class="acronym-row">
+            <div class="acronym-letter">CA</div>
+            <div>
+              <div class="acronym-word">Cafe</div>
+              <div class="acronym-desc">Kafe &amp; Profesyonel Servis Noktaları</div>
+            </div>
+          </div>
+        </div>
+        <p class="horeca-caption">
+          "Profesyonel mutfaklarda zaman yalnızca zaman değildir; <strong>hizmet kalitesinin temelidir.</strong>"
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote-section">
+  <p class="quote-text">
+    "Noon olarak gıdanın yalnızca bir ürün değil; <em>süreklilik, kalite</em> ve güven anlamına geldiğine inanıyoruz."
+  </p>
+  <div class="quote-attr">— NOON FOOD SERVICE &nbsp;·&nbsp; Global X Gıda Dağıtım</div>
+</div>
+
+<!-- BRANDS -->
+<section class="brands-section">
+  <div class="brands-header">
+    <div class="section-label">Referanslarımız</div>
+    <h2 class="section-title">Bize Güvenen <em>Markalar</em></h2>
+    <p class="brands-sub">Dünya çapında güvenilen markalardan profesyonel kalitede ürünler tedarik ediyoruz.</p>
+  </div>
+  <div class="brands-slider-wrap">
+    <div class="brands-track">
+      <div class="brand-logo-item"><img src="../Callebaut.png" alt="Callebaut"></div>
+      <div class="brand-logo-item"><img src="../heinz-1869-logo-png-transparent.png" alt="Heinz"></div>
+      <div class="brand-logo-item"><img src="../kunden-logo-naarmann.png" alt="Naarmann"></div>
+      <div class="brand-logo-item"><img src="../Logo_Barilla.png" alt="Barilla"></div>
+      <div class="brand-logo-item"><img src="../logo.png" alt="Ateşoğlu"></div>
+      <div class="brand-logo-item"><img src="../Callebaut.png" alt="Callebaut"></div>
+      <div class="brand-logo-item"><img src="../heinz-1869-logo-png-transparent.png" alt="Heinz"></div>
+      <div class="brand-logo-item"><img src="../kunden-logo-naarmann.png" alt="Naarmann"></div>
+      <div class="brand-logo-item"><img src="../Logo_Barilla.png" alt="Barilla"></div>
+      <div class="brand-logo-item"><img src="../logo.png" alt="Ateşoğlu"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="iletisim">
+  <div class="contact-grid">
+    <div>
+      <div class="section-label">İletişim</div>
+      <h2 class="section-title">Teklif Alın,<br><em>Ortaklık Kurun</em></h2>
+      <p style="font-size:16px;color:var(--ink-light);line-height:1.85;max-width:400px;margin-bottom:8px;">
+        İşletmenizin ihtiyaçlarını konuşalım. Teklif almak, ürün bilgisi edinmek veya tedarik sürecinizi planlamak için bize ulaşın.
+      </p>
+      <div class="contact-info-cards">
+        <div class="contact-card">
+          <div class="contact-card-icon">📍</div>
+          <div>
+            <div class="contact-card-label">Adres</div>
+            <div class="contact-card-value">İGTOT 3. Ada 12-A Blok No:15<br>Başakşehir / İstanbul</div>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-icon">🕐</div>
+          <div>
+            <div class="contact-card-label">Operasyon Saatleri</div>
+            <div class="contact-card-value">
+              7 gün 24 saat ulaşılabilir<br>
+              <span style="color:var(--blue);font-size:13px;">24 saat içinde teslimat hedefi</span>
+            </div>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-icon">🏢</div>
+          <div>
+            <div class="contact-card-label">Şirket</div>
+            <div class="contact-card-value">
+              Global X Gıda Dağıtım<br>
+              <span style="color:var(--ink-light);font-size:13px;">B2B &middot; HORECA Çözümleri</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="address-map"></div>
+    </div>
+
+    <div class="contact-form fade-up">
+      <h3>Teklif Talebi</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ad Soyad</label>
+          <input type="text" placeholder="Ad Soyad">
+        </div>
+        <div class="form-group">
+          <label>Telefon</label>
+          <input type="tel" placeholder="+90 5xx xxx xx xx">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>İşletme / Şirket Adı</label>
+        <input type="text" placeholder="İşletme adınız">
+      </div>
+      <div class="form-group">
+        <label>İşletme Türü</label>
+        <select>
+          <option value="" disabled selected>Seçiniz</option>
+          <option>Restoran</option><option>Otel</option><option>Kafe</option>
+          <option>Pastane</option><option>Catering Şirketi</option>
+          <option>Endüstriyel Mutfak</option><option>Diğer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>İlgilendiğiniz Ürün Kategorisi</label>
+        <select>
+          <option value="" disabled selected>Kategori seçiniz</option>
+          <option>Temel Gıda Ürünleri</option>
+          <option>Dünya Mutfağı Ürünleri</option>
+          <option>Pastacılık &amp; Fırıncılık</option>
+          <option>İçecek &amp; Bar Ürünleri</option>
+          <option>İthal &amp; Özel Ürünler</option>
+          <option>HORECA Çözümleri</option>
+          <option>Tüm Kategoriler</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mesajınız</label>
+        <textarea placeholder="İşletmeniz ve ihtiyaçlarınız hakkında kısaca bilgi verin..."></textarea>
+      </div>
+      <button class="btn-submit" onclick="handleSubmit(event)">Teklif Talebi Gönder →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand-section">
+    <div>
+      <div class="footer-brand-name">NOON <span>FOOD SERVICE</span></div>
+      <div class="footer-brand-company">Global X Gıda Dağıtım · B2B &amp; HORECA</div>
+    </div>
+    <div class="footer-brand-tagline">
+      Profesyonel mutfakların<br>operasyonel çözüm ortağı.
+    </div>
+  </div>
+
+  <div class="footer-inner">
+    <div>
+      <a href="#" class="footer-logo">
+        <img src="../noon_logo__2_-removebg-preview.png" alt="NOON Food Service">
+      </a>
+      <p class="footer-desc">
+        Profesyonel mutfakların operasyonel çözüm ortağı. 7/24 erişilebilir, 24 saat teslimat.
+      </p>
+    </div>
+    <div>
+      <div class="footer-col-title">Hızlı Bağlantılar</div>
+      <ul class="footer-links">
+        <li><a href="#hakkimizda">Hakkımızda</a></li>
+        <li><a href="#urunler">Ürünler</a></li>
+        <li><a href="#sektorler">Sektörler</a></li>
+        <li><a href="#horeca">HORECA</a></li>
+        <li><a href="#iletisim">İletişim</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Ürün Kategorileri</div>
+      <ul class="footer-links">
+        <li><a href="#urunler">Temel Gıda</a></li>
+        <li><a href="#urunler">Dünya Mutfağı</a></li>
+        <li><a href="#urunler">Pastacılık</a></li>
+        <li><a href="#urunler">İçecek &amp; Bar</a></li>
+        <li><a href="#urunler">İthal Ürünler</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">İletişim</div>
+      <ul class="footer-links">
+        <li><a href="#">İGTOT 3. Ada 12-A Blok</a></li>
+        <li><a href="#">No:15, Başakşehir</a></li>
+        <li><a href="#">İstanbul, Türkiye</a></li>
+        <li style="margin-top:8px;"><a href="#iletisim" style="color:rgba(56,182,255,0.7);">Teklif Al →</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">
+      © 2024 NOON FOOD SERVICE — Tüm hakları saklıdır.<br>
+      <span style="opacity:0.6;font-size:10.5px;">Global X Gıda Dağıtım · İGTOT, Başakşehir / İstanbul</span>
+    </div>
+    <div style="font-size:11.5px;color:rgba(255,255,255,0.2);letter-spacing:0.06em;">
+      B2B · HORECA · Profesyonel Tedarik
+    </div>
+  </div>
+</footer>
+
+</div><!-- /site-content -->
+
+<script>
+  // ── SCROLL & NAV ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.06, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fade-up, .check-item').forEach(el => observer.observe(el));
+  setTimeout(() => {
+    document.querySelectorAll('.fade-up, .check-item').forEach(el => {
+      if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible');
+    });
+  }, 120);
+
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.style.boxShadow = window.scrollY > 30 ? '0 1px 20px rgba(0,0,0,0.07)' : 'none';
+  }, { passive: true });
+
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links-center a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
+    navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + cur); });
+  }, { passive: true });
+
+  function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); document.body.style.overflow = ''; }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target;
+    btn.textContent = '✓ Talebiniz Alındı';
+    btn.style.background = '#16a34a';
+    setTimeout(() => { btn.textContent = 'Teklif Talebi Gönder →'; btn.style.background = 'var(--blue)'; }, 3000);
+  }
+
+  window.addEventListener('load', () => {
+    const c = document.querySelector('.hero-content');
+    if (c) {
+      c.style.opacity = '0'; c.style.transform = 'translateY(28px)';
+      requestAnimationFrame(() => {
+        c.style.transition = 'opacity 0.85s ease, transform 0.85s ease';
+        c.style.opacity = '1'; c.style.transform = 'none';
+      });
+    }
+  });
+
+  // ── SPIRAL ANIMATION ──
+  class Vec2 {
+    constructor(x, y) { this.x = x; this.y = y; }
+    static rand(mn, mx) { return mn + Math.random() * (mx - mn); }
+  }
+  class Vec3 {
+    constructor(x, y, z) { this.x = x; this.y = y; this.z = z; }
+  }
+
+  class SpiralStar {
+    constructor(camZ, travel) {
+      this.angle = Math.random() * Math.PI * 2;
+      this.dist  = 30 * Math.random() + 15;
+      this.rotDir = Math.random() > 0.5 ? 1 : -1;
+      this.expRate = 1.2 + Math.random() * 0.8;
+      this.finalScale = 0.7 + Math.random() * 0.6;
+      this.dx = this.dist * Math.cos(this.angle);
+      this.dy = this.dist * Math.sin(this.angle);
+      this.sLoc = (1 - Math.pow(1 - Math.random(), 3.0)) / 1.3;
+      this.z = Vec2.rand(0.5 * camZ, travel + camZ);
+      this.z = this.z * (1 - 0.3 * this.sLoc) + (travel / 2) * (0.3 * this.sLoc);
+      this.sw = Math.pow(Math.random(), 2.0);
+    }
+    render(p, c) {
+      const sp = c.spiralPath(this.sLoc);
+      const q = p - this.sLoc;
+      if (q <= 0) return;
+      const dp = Math.min(4 * q, 1);
+      const el = c.easeElastic(dp);
+      const pw = dp * dp;
+      let ease;
+      if (dp < 0.3) ease = c.lerp(dp, pw, dp / 0.3);
+      else if (dp < 0.7) ease = c.lerp(pw, el, (dp - 0.3) / 0.4);
+      else ease = el;
+
+      let sx, sy;
+      if (dp < 0.3) {
+        sx = c.lerp(sp.x, sp.x + this.dx * 0.3, ease / 0.3);
+        sy = c.lerp(sp.y, sp.y + this.dy * 0.3, ease / 0.3);
+      } else if (dp < 0.7) {
+        const mp = (dp - 0.3) / 0.4;
+        const cs = Math.sin(mp * Math.PI) * this.rotDir * 1.5;
+        const bx = sp.x + this.dx * 0.3, by = sp.y + this.dy * 0.3;
+        const tx = sp.x + this.dx * 0.7, ty = sp.y + this.dy * 0.7;
+        sx = c.lerp(bx, tx, mp) + (-this.dy * 0.4 * cs) * mp;
+        sy = c.lerp(by, ty, mp) + ( this.dx * 0.4 * cs) * mp;
+      } else {
+        const fp = (dp - 0.7) / 0.3;
+        const bx = sp.x + this.dx * 0.7, by = sp.y + this.dy * 0.7;
+        const td = this.dist * this.expRate * 1.5;
+        const sa = this.angle + 1.2 * this.rotDir * fp * Math.PI;
+        sx = c.lerp(bx, sp.x + td * Math.cos(sa), fp);
+        sy = c.lerp(by, sp.y + td * Math.sin(sa), fp);
+      }
+
+      const vx = (this.z - c.CAM_Z) * sx / c.VIEW_ZOOM;
+      const vy = (this.z - c.CAM_Z) * sy / c.VIEW_ZOOM;
+
+      let sm = 1.0;
+      if (dp < 0.6) sm = 1.0 + dp * 0.2;
+      else { const t = (dp - 0.6) / 0.4; sm = c.lerp(1.2, this.finalScale, t); }
+
+      c.showDot(new Vec3(vx, vy, this.z), 8.5 * this.sw * sm);
+    }
+  }
+
+  class SpiralCtrl {
+    constructor(canvas, ctx, size) {
+      this.canvas = canvas; this.ctx = ctx; this.size = size;
+      this.time = 0; this.stars = [];
+      this.CAM_Z = -400; this.TRAVEL = 3400;
+      this.DOT_Y = 28; this.VIEW_ZOOM = 100;
+      this.N = 5000; this.TRAIL = 80; this.CHG_T = 0.32;
+
+      // Seeded stars (deterministic)
+      const orig = Math.random;
+      let seed = 1234;
+      Math.random = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+      for (let i = 0; i < this.N; i++) this.stars.push(new SpiralStar(this.CAM_Z, this.TRAVEL));
+      Math.random = orig;
+      // Random stars
+      for (let i = 0; i < this.N; i++) this.stars.push(new SpiralStar(this.CAM_Z, this.TRAVEL));
+
+      this.tl = gsap.timeline({ repeat: -1 });
+      this.tl.to(this, { time: 1, duration: 15, ease: 'none', onUpdate: () => this.render() });
+    }
+
+    ease(p, g) { return p < 0.5 ? 0.5 * Math.pow(2*p,g) : 1 - 0.5 * Math.pow(2*(1-p),g); }
+    easeElastic(x) {
+      if (x <= 0) return 0; if (x >= 1) return 1;
+      const c4 = (2*Math.PI)/4.5;
+      return Math.pow(2,-8*x)*Math.sin((x*8-0.75)*c4)+1;
+    }
+    map(v,s1,e1,s2,e2) { return s2+(e2-s2)*((v-s1)/(e1-s1)); }
+    clamp(v,mn,mx) { return Math.min(Math.max(v,mn),mx); }
+    lerp(s,e,t) { return s*(1-t)+e*t; }
+
+    spiralPath(p) {
+      p = this.clamp(1.2*p,0,1); p = this.ease(p,1.8);
+      const theta = 2*Math.PI*6*Math.sqrt(p);
+      const r = 170*Math.sqrt(p);
+      return new Vec2(r*Math.cos(theta), r*Math.sin(theta)+this.DOT_Y);
+    }
+
+    rotate(v1,v2,p,ccw) {
+      const mx=(v1.x+v2.x)/2, my=(v1.y+v2.y)/2;
+      const dx=v1.x-mx, dy=v1.y-my;
+      const a=Math.atan2(dy,dx), o=ccw?-1:1;
+      const r=Math.sqrt(dx*dx+dy*dy);
+      const b=Math.sin(p*Math.PI)*0.05*(1-p);
+      return new Vec2(
+        mx+r*(1+b)*Math.cos(a+o*Math.PI*this.easeElastic(p)),
+        my+r*(1+b)*Math.sin(a+o*Math.PI*this.easeElastic(p))
+      );
+    }
+
+    showDot(pos, sf) {
+      const t2 = this.clamp(this.map(this.time,this.CHG_T,1,0,1),0,1);
+      const cz = this.CAM_Z + this.ease(Math.pow(t2,1.2),1.8)*this.TRAVEL;
+      if (pos.z > cz) {
+        const d = pos.z-cz;
+        const x = this.VIEW_ZOOM*pos.x/d, y = this.VIEW_ZOOM*pos.y/d;
+        const sw = 400*sf/d;
+        this.ctx.lineWidth = sw;
+        this.ctx.beginPath();
+        this.ctx.arc(x,y,0.5,0,Math.PI*2);
+        this.ctx.fill();
+      }
+    }
+
+    render() {
+      const ctx = this.ctx;
+      ctx.clearRect(0, 0, this.size, this.size);
+      ctx.save();
+      ctx.translate(this.size/2, this.size/2);
+
+      const t1 = this.clamp(this.map(this.time,0,this.CHG_T+0.25,0,1),0,1);
+      const t2 = this.clamp(this.map(this.time,this.CHG_T,1,0,1),0,1);
+
+      ctx.rotate(-Math.PI*this.ease(t2,2.7));
+
+      // Trail
+      for (let i = 0; i < this.TRAIL; i++) {
+        const f = this.map(i,0,this.TRAIL,1.1,0.1);
+        const sw = (1.3*(1-t1)+3.0*Math.sin(Math.PI*t1))*f;
+        ctx.fillStyle = 'rgba(56,182,255,0.55)';
+        const pos = this.spiralPath(t1-0.00015*i);
+        const off = new Vec2(pos.x+5,pos.y+5);
+        const rot = this.rotate(pos,off,Math.sin(this.time*Math.PI*2)*0.5+0.5,i%2===0);
+        ctx.beginPath(); ctx.arc(rot.x,rot.y,sw/2,0,Math.PI*2); ctx.fill();
+      }
+
+      // Stars
+      ctx.fillStyle = 'rgba(56,182,255,0.4)';
+      for (const s of this.stars) s.render(t1, this);
+
+      // Start dot
+      if (this.time > this.CHG_T) {
+        ctx.fillStyle = 'rgba(56,182,255,0.85)';
+        this.showDot(new Vec3(0, this.CAM_Z*this.DOT_Y/this.VIEW_ZOOM, this.TRAVEL), 2.5);
+      }
+
+      ctx.restore();
+    }
+
+    destroy() { this.tl.kill(); }
+  }
+
+  let spiralCtrl = null;
+  function initSpiral() {
+    const canvas = document.getElementById('spiral-canvas');
+    if (!canvas || typeof gsap === 'undefined') return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    const size = Math.max(window.innerWidth, window.innerHeight);
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(dpr, dpr);
+    if (spiralCtrl) spiralCtrl.destroy();
+    spiralCtrl = new SpiralCtrl(canvas, ctx, size);
+  }
+
+  let resizeTimer;
+  window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(initSpiral, 250); });
+  document.addEventListener('DOMContentLoaded', initSpiral);
+
+  // ── ADDRESS MAP ──
+  function initAddressMap() {
+    if (typeof maplibregl === 'undefined') return;
+    const LNG = 28.773, LAT = 41.0668;
+    const map = new maplibregl.Map({
+      container: 'address-map',
+      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      center: [LNG, LAT],
+      zoom: 14,
+      attributionControl: false,
+      logoPosition: 'bottom-left'
+    });
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+
+    const el = document.createElement('div');
+    el.style.cssText = [
+      'width:20px', 'height:20px', 'border-radius:50%',
+      'background:#38b6ff', 'border:3px solid white',
+      'box-shadow:0 2px 10px rgba(56,182,255,0.55)', 'cursor:pointer'
+    ].join(';');
+
+    new maplibregl.Marker(el)
+      .setLngLat([LNG, LAT])
+      .setPopup(
+        new maplibregl.Popup({ offset: 16, closeButton: false })
+          .setHTML(
+            '<div style="font-family:Inter,sans-serif;padding:2px 0;">' +
+            '<strong style="font-size:12px;color:#0f0f18;display:block;margin-bottom:3px;">NOON FOOD SERVICE</strong>' +
+            '<span style="font-size:11px;color:#8b8ba0;line-height:1.6;">İGTOT 3. Ada 12-A Blok No:15<br>Başakşehir / İstanbul</span>' +
+            '</div>'
+          )
+      )
+      .addTo(map);
+  }
+
+  document.addEventListener('DOMContentLoaded', initAddressMap);
+</script>
+</body>
+</html>
