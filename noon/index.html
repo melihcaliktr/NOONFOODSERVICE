@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --white: #ffffff;
@@ -380,24 +381,76 @@
   .product-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; transition: gap 0.2s; }
   .product-link:hover { gap: 10px; }
 
-  /* ── SECTORS ── */
+  /* ── SECTORS GALLERY ── */
   #sektorler { background: var(--bg-soft); }
-  .sectors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .sector-item {
-    background: white; border: 1px solid var(--border); border-radius: 18px; padding: 32px 24px;
-    display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
-    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; cursor: default;
+  .sectors-gallery-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; margin-bottom: 44px; flex-wrap: wrap;
   }
-  .sector-item:hover { transform: translateY(-4px); border-color: rgba(56,182,255,0.4); box-shadow: var(--shadow-md); }
-  .sector-emoji { font-size: 38px; }
-  .sector-name { font-family: 'Instrument Serif', serif; font-size: 21px; font-weight: 400; color: var(--ink); }
-  .sector-arrow {
-    width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border);
+  .sectors-gallery-nav { display: flex; gap: 8px; flex-shrink: 0; }
+  .sectors-nav-btn {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: white;
     display: flex; align-items: center; justify-content: center;
-    margin-top: auto; transition: background 0.2s, border-color 0.2s;
+    cursor: pointer; color: var(--ink-mid);
+    transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
   }
-  .sector-item:hover .sector-arrow { background: var(--blue); border-color: var(--blue); }
-  .sector-item:hover .sector-arrow path { stroke: white; }
+  .sectors-nav-btn:hover:not([disabled]) { background: var(--blue); border-color: var(--blue); color: white; }
+  .sectors-nav-btn[disabled] { opacity: 0.35; cursor: not-allowed; }
+  .sectors-carousel-outer {
+    margin-left: -5vw; margin-right: -5vw;
+    overflow: hidden; position: relative;
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+  }
+  .sectors-carousel-track {
+    display: flex; gap: 20px;
+    padding: 12px 5vw 20px;
+    transition: transform 0.45s cubic-bezier(0.25, 0.1, 0.25, 1);
+    will-change: transform;
+  }
+  .sector-gallery-card {
+    flex-shrink: 0; width: 320px; border-radius: 20px; overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .sector-gallery-card-inner { position: relative; height: 440px; overflow: hidden; }
+  .sector-gallery-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    transition: transform 0.45s ease;
+  }
+  .sector-gallery-card:hover .sector-gallery-img { transform: scale(1.06); }
+  .sector-gallery-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 20%, rgba(15,15,24,0.38) 58%, rgba(15,15,24,0.88) 100%);
+  }
+  .sector-gallery-content {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 28px; color: white;
+  }
+  .sector-gallery-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px; font-weight: 400; margin-bottom: 10px; line-height: 1.2;
+  }
+  .sector-gallery-desc {
+    font-size: 13.5px; line-height: 1.65; color: rgba(255,255,255,0.72);
+    margin-bottom: 18px;
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .sector-gallery-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600; color: var(--blue);
+    text-decoration: none; transition: gap 0.2s;
+  }
+  .sector-gallery-link:hover { gap: 10px; }
+  .sectors-dots {
+    display: flex; justify-content: center; gap: 8px; margin-top: 28px;
+  }
+  .sector-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border); border: none; cursor: pointer; padding: 0;
+    transition: background 0.25s, transform 0.25s;
+  }
+  .sector-dot.active { background: var(--blue); transform: scale(1.3); }
 
   /* ── HORECA ── */
   #horeca { background: white; }
@@ -615,7 +668,6 @@
     .hamburger { display: flex; }
     .about-grid, .horeca-grid, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
     .products-grid { grid-template-columns: 1fr 1fr; }
-    .sectors-grid { grid-template-columns: 1fr 1fr; }
     .stats-inner { grid-template-columns: repeat(3, 1fr); }
     .about-pillars { grid-template-columns: 1fr 1fr; }
     .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
@@ -624,7 +676,7 @@
     .footer-brand-tagline { text-align: left; }
   }
   @media (max-width: 600px) {
-    .products-grid, .sectors-grid { grid-template-columns: 1fr; }
+    .products-grid { grid-template-columns: 1fr; }
     .form-row { grid-template-columns: 1fr; }
     .contact-form { padding: 26px 20px; }
     section { padding: 72px 5vw; }
@@ -660,7 +712,6 @@
     <img src="../noon_logo__2_-removebg-preview.png" alt="NOON Food Service">
     <div class="nav-logo-text">
       <span class="nav-logo-brand">Noon Food Service</span>
-      <span class="nav-logo-company">Global X Gıda Dağıtım</span>
     </div>
   </a>
 
@@ -762,8 +813,6 @@
   <div class="brand-ticker-track">
     <span class="brand-name">NOON FOOD SERVICE</span>
     <span class="brand-sep">·</span>
-    <span>GLOBAL X GIDA DAĞITIM</span>
-    <span class="brand-sep">·</span>
     <span>PROFESYONEL TEDARIK</span>
     <span class="brand-sep">·</span>
     <span>B2B &amp; HORECA ÇÖZÜMLERİ</span>
@@ -771,8 +820,6 @@
     <span>BAŞAKŞEHİR / İSTANBUL</span>
     <span class="brand-sep">·</span>
     <span class="brand-name">NOON FOOD SERVICE</span>
-    <span class="brand-sep">·</span>
-    <span>GLOBAL X GIDA DAĞITIM</span>
     <span class="brand-sep">·</span>
     <span>PROFESYONEL TEDARIK</span>
     <span class="brand-sep">·</span>
@@ -946,40 +993,100 @@
 
 <!-- SECTORS -->
 <section id="sektorler">
-  <div class="section-label">Hizmet Sektörleri</div>
-  <h2 class="section-title">Kimlere Hizmet <em>Veriyoruz?</em></h2>
-  <p class="section-sub">Profesyonel mutfak operasyonu yürüten tüm işletme türlerine özel çözümler sunuyoruz.</p>
-  <div class="sectors-grid">
-    <div class="sector-item fade-up">
-      <div class="sector-emoji">🍽️</div>
-      <div class="sector-name">Restoranlar</div>
-      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="sectors-gallery-header">
+    <div>
+      <div class="section-label">Hizmet Sektörleri</div>
+      <h2 class="section-title">Kimlere Hizmet <em>Veriyoruz?</em></h2>
+      <p class="section-sub" style="margin-bottom:0;">Profesyonel mutfak operasyonu yürüten tüm işletme türlerine özel çözümler sunuyoruz.</p>
     </div>
-    <div class="sector-item fade-up" style="transition-delay:0.07s">
-      <div class="sector-emoji">🏨</div>
-      <div class="sector-name">Oteller</div>
-      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="sectors-gallery-nav">
+      <button class="sectors-nav-btn" id="sectorsPrev" disabled aria-label="Önceki">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="sectors-nav-btn" id="sectorsNext" aria-label="Sonraki">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
-    <div class="sector-item fade-up" style="transition-delay:0.14s">
-      <div class="sector-emoji">☕</div>
-      <div class="sector-name">Kafeler</div>
-      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
+  <div class="sectors-carousel-outer">
+    <div class="sectors-carousel-track" id="sectorsTrack">
+      <div class="sector-gallery-card fade-up">
+        <div class="sector-gallery-card-inner">
+          <img src="../Restoranlar.jpg" alt="Restoranlar" class="sector-gallery-img">
+          <div class="sector-gallery-overlay"></div>
+          <div class="sector-gallery-content">
+            <div class="sector-gallery-name">Restoranlar</div>
+            <div class="sector-gallery-desc">Fine dining'den günlük mutfağa kadar tüm restoran formatları için eksiksiz gıda tedariki.</div>
+            <a href="#iletisim" class="sector-gallery-link">Teklif Alın <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="sector-gallery-card fade-up" style="transition-delay:0.07s">
+        <div class="sector-gallery-card-inner">
+          <img src="../Oteller.jpg" alt="Oteller" class="sector-gallery-img">
+          <div class="sector-gallery-overlay"></div>
+          <div class="sector-gallery-content">
+            <div class="sector-gallery-name">Oteller</div>
+            <div class="sector-gallery-desc">Otel restoranları, bar ve kahvaltı operasyonları için geniş ürün portföyü ve düzenli tedarik.</div>
+            <a href="#iletisim" class="sector-gallery-link">Teklif Alın <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="sector-gallery-card fade-up" style="transition-delay:0.14s">
+        <div class="sector-gallery-card-inner">
+          <img src="../Kafeler.jpg" alt="Kafeler" class="sector-gallery-img">
+          <div class="sector-gallery-overlay"></div>
+          <div class="sector-gallery-content">
+            <div class="sector-gallery-name">Kafeler</div>
+            <div class="sector-gallery-desc">Kahve, içecek ve atıştırmalık kategorilerinde profesyonel kafe operasyonlarına özel çözümler.</div>
+            <a href="#iletisim" class="sector-gallery-link">Teklif Alın <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="sector-gallery-card fade-up" style="transition-delay:0.21s">
+        <div class="sector-gallery-card-inner">
+          <img src="../Pastaneler.jpg" alt="Pastaneler" class="sector-gallery-img">
+          <div class="sector-gallery-overlay"></div>
+          <div class="sector-gallery-content">
+            <div class="sector-gallery-name">Pastaneler</div>
+            <div class="sector-gallery-desc">Butik pastahanelerden endüstriyel fırınlara kadar kaliteli ham madde ve profesyonel ürünler.</div>
+            <a href="#iletisim" class="sector-gallery-link">Teklif Alın <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="sector-gallery-card fade-up" style="transition-delay:0.28s">
+        <div class="sector-gallery-card-inner">
+          <img src="../Catering.jpg" alt="Catering Şirketleri" class="sector-gallery-img">
+          <div class="sector-gallery-overlay"></div>
+          <div class="sector-gallery-content">
+            <div class="sector-gallery-name">Catering Şirketleri</div>
+            <div class="sector-gallery-desc">Toplu yemek ve etkinlik operasyonları için büyük hacimli, zamanında teslimat garantisi.</div>
+            <a href="#iletisim" class="sector-gallery-link">Teklif Alın <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="sector-gallery-card fade-up" style="transition-delay:0.35s">
+        <div class="sector-gallery-card-inner">
+          <img src="../Endüstriyel.jpg" alt="Endüstriyel Mutfaklar" class="sector-gallery-img">
+          <div class="sector-gallery-overlay"></div>
+          <div class="sector-gallery-content">
+            <div class="sector-gallery-name">Endüstriyel Mutfaklar</div>
+            <div class="sector-gallery-desc">Yüksek kapasiteli operasyonlar için standart kalitede kesintisiz tedarik yönetimi.</div>
+            <a href="#iletisim" class="sector-gallery-link">Teklif Alın <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="sector-item fade-up" style="transition-delay:0.21s">
-      <div class="sector-emoji">🎂</div>
-      <div class="sector-name">Pastaneler</div>
-      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-    <div class="sector-item fade-up" style="transition-delay:0.28s">
-      <div class="sector-emoji">🍱</div>
-      <div class="sector-name">Catering Şirketleri</div>
-      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-    <div class="sector-item fade-up" style="transition-delay:0.35s">
-      <div class="sector-emoji">🏭</div>
-      <div class="sector-name">Endüstriyel Mutfaklar</div>
-      <div class="sector-arrow"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5h9M6.5 2l4.5 4.5L6.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
+  </div>
+
+  <div class="sectors-dots" id="sectorsDots">
+    <button class="sector-dot active" data-index="0" aria-label="Sektör 1"></button>
+    <button class="sector-dot" data-index="1" aria-label="Sektör 2"></button>
+    <button class="sector-dot" data-index="2" aria-label="Sektör 3"></button>
+    <button class="sector-dot" data-index="3" aria-label="Sektör 4"></button>
+    <button class="sector-dot" data-index="4" aria-label="Sektör 5"></button>
+    <button class="sector-dot" data-index="5" aria-label="Sektör 6"></button>
   </div>
 </section>
 
@@ -1059,7 +1166,7 @@
   <p class="quote-text">
     "Noon olarak gıdanın yalnızca bir ürün değil; <em>süreklilik, kalite</em> ve güven anlamına geldiğine inanıyoruz."
   </p>
-  <div class="quote-attr">— NOON FOOD SERVICE &nbsp;·&nbsp; Global X Gıda Dağıtım</div>
+  <div class="quote-attr">— NOON FOOD SERVICE</div>
 </div>
 
 <!-- BRANDS -->
@@ -1076,11 +1183,25 @@
       <div class="brand-logo-item"><img src="../kunden-logo-naarmann.png" alt="Naarmann"></div>
       <div class="brand-logo-item"><img src="../Logo_Barilla.png" alt="Barilla"></div>
       <div class="brand-logo-item"><img src="../logo.png" alt="Ateşoğlu"></div>
+      <div class="brand-logo-item"><img src="../Knorr_Logo_2020.svg.png" alt="Knorr"></div>
+      <div class="brand-logo-item"><img src="../unnamed.png" alt="Biryağ"></div>
+      <div class="brand-logo-item"><img src="../McCain-Foods-logo-768x432.png" alt="McCain"></div>
+      <div class="brand-logo-item"><img src="../Dardanel_logo.svg.png" alt="Dardanel"></div>
+      <div class="brand-logo-item"><img src="../tikvesli-logo-6ECFA495FB-seeklogo.com_.png" alt="Tikvesli"></div>
+      <div class="brand-logo-item"><img src="../bahcivan-logo.png" alt="Bahçıvan"></div>
+      <div class="brand-logo-item"><img src="../Amoy.webp" alt="Amoy"></div>
       <div class="brand-logo-item"><img src="../Callebaut.png" alt="Callebaut"></div>
       <div class="brand-logo-item"><img src="../heinz-1869-logo-png-transparent.png" alt="Heinz"></div>
       <div class="brand-logo-item"><img src="../kunden-logo-naarmann.png" alt="Naarmann"></div>
       <div class="brand-logo-item"><img src="../Logo_Barilla.png" alt="Barilla"></div>
       <div class="brand-logo-item"><img src="../logo.png" alt="Ateşoğlu"></div>
+      <div class="brand-logo-item"><img src="../Knorr_Logo_2020.svg.png" alt="Knorr"></div>
+      <div class="brand-logo-item"><img src="../unnamed.png" alt="Biryağ"></div>
+      <div class="brand-logo-item"><img src="../McCain-Foods-logo-768x432.png" alt="McCain"></div>
+      <div class="brand-logo-item"><img src="../Dardanel_logo.svg.png" alt="Dardanel"></div>
+      <div class="brand-logo-item"><img src="../tikvesli-logo-6ECFA495FB-seeklogo.com_.png" alt="Tikvesli"></div>
+      <div class="brand-logo-item"><img src="../bahcivan-logo.png" alt="Bahçıvan"></div>
+      <div class="brand-logo-item"><img src="../Amoy.webp" alt="Amoy"></div>
     </div>
   </div>
 </section>
@@ -1099,7 +1220,7 @@
           <div class="contact-card-icon">📍</div>
           <div>
             <div class="contact-card-label">Adres</div>
-            <div class="contact-card-value">İGTOT 3. Ada 12-A Blok No:15<br>Başakşehir / İstanbul</div>
+            <div class="contact-card-value">İGTOT 3. Ada 12 A Blok No:15<br>Başakşehir / İstanbul</div>
           </div>
         </div>
         <div class="contact-card">
@@ -1109,16 +1230,6 @@
             <div class="contact-card-value">
               7 gün 24 saat ulaşılabilir<br>
               <span style="color:var(--blue);font-size:13px;">24 saat içinde teslimat hedefi</span>
-            </div>
-          </div>
-        </div>
-        <div class="contact-card">
-          <div class="contact-card-icon">🏢</div>
-          <div>
-            <div class="contact-card-label">Şirket</div>
-            <div class="contact-card-value">
-              Global X Gıda Dağıtım<br>
-              <span style="color:var(--ink-light);font-size:13px;">B2B &middot; HORECA Çözümleri</span>
             </div>
           </div>
         </div>
@@ -1132,16 +1243,16 @@
       <div class="form-row">
         <div class="form-group">
           <label>Ad Soyad</label>
-          <input type="text" placeholder="Ad Soyad">
+          <input id="inp-isim" type="text" placeholder="Ad Soyad">
         </div>
         <div class="form-group">
           <label>Telefon</label>
-          <input type="tel" placeholder="+90 5xx xxx xx xx">
+          <input id="inp-telefon" type="tel" placeholder="+90 5xx xxx xx xx">
         </div>
       </div>
       <div class="form-group">
         <label>İşletme / Şirket Adı</label>
-        <input type="text" placeholder="İşletme adınız">
+        <input id="inp-firma" type="text" placeholder="İşletme adınız">
       </div>
       <div class="form-group">
         <label>İşletme Türü</label>
@@ -1167,7 +1278,7 @@
       </div>
       <div class="form-group">
         <label>Mesajınız</label>
-        <textarea placeholder="İşletmeniz ve ihtiyaçlarınız hakkında kısaca bilgi verin..."></textarea>
+        <textarea id="inp-mesaj" placeholder="İşletmeniz ve ihtiyaçlarınız hakkında kısaca bilgi verin..."></textarea>
       </div>
       <button class="btn-submit" onclick="handleSubmit(event)">Teklif Talebi Gönder →</button>
     </div>
@@ -1179,7 +1290,7 @@
   <div class="footer-brand-section">
     <div>
       <div class="footer-brand-name">NOON <span>FOOD SERVICE</span></div>
-      <div class="footer-brand-company">Global X Gıda Dağıtım · B2B &amp; HORECA</div>
+      <div class="footer-brand-company">B2B &amp; HORECA</div>
     </div>
     <div class="footer-brand-tagline">
       Profesyonel mutfakların<br>operasyonel çözüm ortağı.
@@ -1218,7 +1329,7 @@
     <div>
       <div class="footer-col-title">İletişim</div>
       <ul class="footer-links">
-        <li><a href="#">İGTOT 3. Ada 12-A Blok</a></li>
+        <li><a href="#">İGTOT 3. Ada 12 A Blok</a></li>
         <li><a href="#">No:15, Başakşehir</a></li>
         <li><a href="#">İstanbul, Türkiye</a></li>
         <li style="margin-top:8px;"><a href="#iletisim" style="color:rgba(56,182,255,0.7);">Teklif Al →</a></li>
@@ -1229,7 +1340,7 @@
   <div class="footer-bottom">
     <div class="footer-copy">
       © 2024 NOON FOOD SERVICE — Tüm hakları saklıdır.<br>
-      <span style="opacity:0.6;font-size:10.5px;">Global X Gıda Dağıtım · İGTOT, Başakşehir / İstanbul</span>
+      <span style="opacity:0.6;font-size:10.5px;">İGTOT, Başakşehir / İstanbul</span>
     </div>
     <div style="font-size:11.5px;color:rgba(255,255,255,0.2);letter-spacing:0.06em;">
       B2B · HORECA · Profesyonel Tedarik
@@ -1240,6 +1351,11 @@
 </div><!-- /site-content -->
 
 <script>
+  // ── SUPABASE CONFIG ──
+  const SUPABASE_URL = 'https://YOUR_PROJECT_REF.supabase.co'; // ← Supabase proje URL'inizi buraya girin
+  const SUPABASE_ANON_KEY = 'sb_publishable_szwqXi8OXhGatuKFemU2PA_IAjUrMhH';
+  const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // ── SCROLL & NAV ──
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
@@ -1267,12 +1383,45 @@
   function openMobileNav() { document.getElementById('mobileNav').classList.add('open'); document.body.style.overflow = 'hidden'; }
   function closeMobileNav() { document.getElementById('mobileNav').classList.remove('open'); document.body.style.overflow = ''; }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const btn = e.target;
-    btn.textContent = '✓ Talebiniz Alındı';
-    btn.style.background = '#16a34a';
-    setTimeout(() => { btn.textContent = 'Teklif Talebi Gönder →'; btn.style.background = 'var(--blue)'; }, 3000);
+
+    const isim     = document.getElementById('inp-isim')?.value.trim();
+    const telefon  = document.getElementById('inp-telefon')?.value.trim();
+    const firma_adi = document.getElementById('inp-firma')?.value.trim();
+    const mesaj    = document.getElementById('inp-mesaj')?.value.trim();
+
+    if (!isim || !telefon || !firma_adi) {
+      btn.textContent = '⚠ Lütfen zorunlu alanları doldurun';
+      btn.style.background = '#f59e0b';
+      setTimeout(() => { btn.textContent = 'Teklif Talebi Gönder →'; btn.style.background = 'var(--blue)'; }, 3000);
+      return;
+    }
+
+    btn.textContent = 'Gönderiliyor...';
+    btn.disabled = true;
+
+    const { error } = await _supabase
+      .from('talepler')
+      .insert([{ isim, telefon, firma_adi, mesaj }]);
+
+    btn.disabled = false;
+
+    if (error) {
+      console.error('Supabase hatası:', error.message);
+      btn.textContent = '✗ Bir hata oluştu, tekrar deneyin';
+      btn.style.background = '#ef4444';
+      setTimeout(() => { btn.textContent = 'Teklif Talebi Gönder →'; btn.style.background = 'var(--blue)'; }, 4000);
+    } else {
+      btn.textContent = '✓ Talebiniz Alındı';
+      btn.style.background = '#16a34a';
+      ['inp-isim', 'inp-telefon', 'inp-firma', 'inp-mesaj'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      setTimeout(() => { btn.textContent = 'Teklif Talebi Gönder →'; btn.style.background = 'var(--blue)'; }, 4000);
+    }
   }
 
   window.addEventListener('load', () => {
@@ -1503,7 +1652,7 @@
           .setHTML(
             '<div style="font-family:Inter,sans-serif;padding:2px 0;">' +
             '<strong style="font-size:12px;color:#0f0f18;display:block;margin-bottom:3px;">NOON FOOD SERVICE</strong>' +
-            '<span style="font-size:11px;color:#8b8ba0;line-height:1.6;">İGTOT 3. Ada 12-A Blok No:15<br>Başakşehir / İstanbul</span>' +
+            '<span style="font-size:11px;color:#8b8ba0;line-height:1.6;">İGTOT 3. Ada 12 A Blok No:15<br>Başakşehir / İstanbul</span>' +
             '</div>'
           )
       )
@@ -1511,6 +1660,78 @@
   }
 
   document.addEventListener('DOMContentLoaded', initAddressMap);
+
+  // ── SECTORS GALLERY CAROUSEL ──
+  (function() {
+    var sIdx = 0;
+    var TOTAL = 6;
+    var GAP = 20;
+
+    function stepW() {
+      var track = document.getElementById('sectorsTrack');
+      if (track && track.children.length) return track.children[0].offsetWidth + GAP;
+      return 340;
+    }
+
+    function visibleCount() {
+      var outer = document.querySelector('.sectors-carousel-outer');
+      var sw = stepW();
+      if (!outer || !sw) return 3;
+      return Math.max(1, Math.floor(outer.offsetWidth / sw));
+    }
+
+    function maxIdx() { return Math.max(0, TOTAL - visibleCount()); }
+
+    function update() {
+      var track = document.getElementById('sectorsTrack');
+      var prevBtn = document.getElementById('sectorsPrev');
+      var nextBtn = document.getElementById('sectorsNext');
+      var dots = document.querySelectorAll('.sector-dot');
+      if (!track) return;
+      track.style.transform = 'translateX(-' + (sIdx * stepW()) + 'px)';
+      if (prevBtn) prevBtn.disabled = sIdx === 0;
+      if (nextBtn) nextBtn.disabled = sIdx >= maxIdx();
+      dots.forEach(function(d, i) { d.classList.toggle('active', i === sIdx); });
+    }
+
+    function nav(dir) {
+      sIdx = Math.max(0, Math.min(sIdx + dir, maxIdx()));
+      update();
+    }
+
+    window.addEventListener('resize', function() {
+      sIdx = Math.min(sIdx, maxIdx());
+      update();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var prevBtn = document.getElementById('sectorsPrev');
+      var nextBtn = document.getElementById('sectorsNext');
+      var dots = document.querySelectorAll('.sector-dot');
+
+      if (prevBtn) prevBtn.addEventListener('click', function() { nav(-1); });
+      if (nextBtn) nextBtn.addEventListener('click', function() { nav(1); });
+
+      dots.forEach(function(d) {
+        d.addEventListener('click', function() {
+          sIdx = Math.min(parseInt(d.getAttribute('data-index'), 10) || 0, maxIdx());
+          update();
+        });
+      });
+
+      var track = document.getElementById('sectorsTrack');
+      var touchX = 0;
+      if (track) {
+        track.addEventListener('touchstart', function(e) { touchX = e.touches[0].clientX; }, { passive: true });
+        track.addEventListener('touchend', function(e) {
+          var diff = touchX - e.changedTouches[0].clientX;
+          if (Math.abs(diff) > 50) nav(diff > 0 ? 1 : -1);
+        });
+      }
+
+      update();
+    });
+  })();
 </script>
 </body>
 </html>
